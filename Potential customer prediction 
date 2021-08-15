@@ -1,0 +1,2664 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.7.4"
+    },
+    "colab": {
+      "name": "04-Keras-Project-Exercise-Solutions.ipynb",
+      "provenance": [],
+      "include_colab_link": true
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/AbinS97/Data-Science-Projects/blob/main/Potential%20customer%20prediction%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "jY8TTsDjaCiP"
+      },
+      "source": [
+        "#Prediction of potential customer from LendingClub dataset using Neural network.\n",
+        "\n",
+        "## The Data\n",
+        "\n",
+        "We will be using a subset of the LendingClub DataSet obtained from Kaggle: https://www.kaggle.com/wordsforthewise/lending-club\n",
+        "\n",
+        "\n",
+        "LendingClub is a US peer-to-peer lending company, headquartered in San Francisco, California. It was the first peer-to-peer lender to register its offerings as securities with the Securities and Exchange Commission (SEC), and to offer loan trading on a secondary market. LendingClub is the world's largest peer-to-peer lending platform.\n",
+        "\n",
+        "### Our Goal\n",
+        "\n",
+        "\n",
+        "*   List item\n",
+        "*   List item\n",
+        "\n",
+        "\n",
+        "Given historical data on loans given out with information on whether or not the borrower defaulted (charge-off), can we build a model thatcan predict wether or nor a borrower will pay back their loan? This way in the future when we get a new potential customer we can assess whether or not they are likely to pay back the loan. Keep in mind classification metrics when evaluating the performance of your model!\n",
+        "\n",
+        "The \"loan_status\" column contains our label.\n",
+        "\n",
+        "### Data Overview"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "4GixBIjaaCiP"
+      },
+      "source": [
+        "----\n",
+        "-----\n",
+        "There are many LendingClub data sets on Kaggle. Here is the information on this particular data set:\n",
+        "\n",
+        "<table border=\"1\" class=\"dataframe\">\n",
+        "  <thead>\n",
+        "    <tr style=\"text-align: right;\">\n",
+        "      <th></th>\n",
+        "      <th>LoanStatNew</th>\n",
+        "      <th>Description</th>\n",
+        "    </tr>\n",
+        "  </thead>\n",
+        "  <tbody>\n",
+        "    <tr>\n",
+        "      <th>0</th>\n",
+        "      <td>loan_amnt</td>\n",
+        "      <td>The listed amount of the loan applied for by the borrower. If at some point in time, the credit department reduces the loan amount, then it will be reflected in this value.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>1</th>\n",
+        "      <td>term</td>\n",
+        "      <td>The number of payments on the loan. Values are in months and can be either 36 or 60.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>2</th>\n",
+        "      <td>int_rate</td>\n",
+        "      <td>Interest Rate on the loan</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>3</th>\n",
+        "      <td>installment</td>\n",
+        "      <td>The monthly payment owed by the borrower if the loan originates.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>4</th>\n",
+        "      <td>grade</td>\n",
+        "      <td>LC assigned loan grade</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>5</th>\n",
+        "      <td>sub_grade</td>\n",
+        "      <td>LC assigned loan subgrade</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>6</th>\n",
+        "      <td>emp_title</td>\n",
+        "      <td>The job title supplied by the Borrower when applying for the loan.*</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>7</th>\n",
+        "      <td>emp_length</td>\n",
+        "      <td>Employment length in years. Possible values are between 0 and 10 where 0 means less than one year and 10 means ten or more years.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>8</th>\n",
+        "      <td>home_ownership</td>\n",
+        "      <td>The home ownership status provided by the borrower during registration or obtained from the credit report. Our values are: RENT, OWN, MORTGAGE, OTHER</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>9</th>\n",
+        "      <td>annual_inc</td>\n",
+        "      <td>The self-reported annual income provided by the borrower during registration.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>10</th>\n",
+        "      <td>verification_status</td>\n",
+        "      <td>Indicates if income was verified by LC, not verified, or if the income source was verified</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>11</th>\n",
+        "      <td>issue_d</td>\n",
+        "      <td>The month which the loan was funded</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>12</th>\n",
+        "      <td>loan_status</td>\n",
+        "      <td>Current status of the loan</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>13</th>\n",
+        "      <td>purpose</td>\n",
+        "      <td>A category provided by the borrower for the loan request.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>14</th>\n",
+        "      <td>title</td>\n",
+        "      <td>The loan title provided by the borrower</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>15</th>\n",
+        "      <td>zip_code</td>\n",
+        "      <td>The first 3 numbers of the zip code provided by the borrower in the loan application.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>16</th>\n",
+        "      <td>addr_state</td>\n",
+        "      <td>The state provided by the borrower in the loan application</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>17</th>\n",
+        "      <td>dti</td>\n",
+        "      <td>A ratio calculated using the borrower’s total monthly debt payments on the total debt obligations, excluding mortgage and the requested LC loan, divided by the borrower’s self-reported monthly income.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>18</th>\n",
+        "      <td>earliest_cr_line</td>\n",
+        "      <td>The month the borrower's earliest reported credit line was opened</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>19</th>\n",
+        "      <td>open_acc</td>\n",
+        "      <td>The number of open credit lines in the borrower's credit file.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>20</th>\n",
+        "      <td>pub_rec</td>\n",
+        "      <td>Number of derogatory public records</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>21</th>\n",
+        "      <td>revol_bal</td>\n",
+        "      <td>Total credit revolving balance</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>22</th>\n",
+        "      <td>revol_util</td>\n",
+        "      <td>Revolving line utilization rate, or the amount of credit the borrower is using relative to all available revolving credit.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>23</th>\n",
+        "      <td>total_acc</td>\n",
+        "      <td>The total number of credit lines currently in the borrower's credit file</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>24</th>\n",
+        "      <td>initial_list_status</td>\n",
+        "      <td>The initial listing status of the loan. Possible values are – W, F</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>25</th>\n",
+        "      <td>application_type</td>\n",
+        "      <td>Indicates whether the loan is an individual application or a joint application with two co-borrowers</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>26</th>\n",
+        "      <td>mort_acc</td>\n",
+        "      <td>Number of mortgage accounts.</td>\n",
+        "    </tr>\n",
+        "    <tr>\n",
+        "      <th>27</th>\n",
+        "      <td>pub_rec_bankruptcies</td>\n",
+        "      <td>Number of public record bankruptcies</td>\n",
+        "    </tr>\n",
+        "  </tbody>\n",
+        "</table>\n",
+        "\n",
+        "---\n",
+        "----"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "lICuI6bxaCiR"
+      },
+      "source": [
+        "## Starter Code\n",
+        "\n",
+        "#### Note: We also provide feature information on the data as a .csv file for easy lookup throughout the notebook:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "hB3fHVD8aCiR"
+      },
+      "source": [
+        "import pandas as pd"
+      ],
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "t4ZBROVwey1t"
+      },
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "bINttK2wfJe3"
+      },
+      "source": [
+        "path = '/content/drive/MyDrive/Colab Notebooks/Neural networks/TensorFlow_FILES/DATA/lending_club_info.csv'\n"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "PoGEZrDlaCiS"
+      },
+      "source": [
+        "data_info = pd.read_csv(path,index_col='LoanStatNew')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OykJmE0XfGjE"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "eRrkRpaHfGru"
+      },
+      "source": [
+        "data_info"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "x_kcH5vjfGyl"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mstC_lUqfIJ-"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Zik-qWyVaCiT"
+      },
+      "source": [
+        "print(data_info.loc['revol_util']['Description'])"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "yZrf8sodaCiW"
+      },
+      "source": [
+        "def feat_info(col_name):\n",
+        "    print(data_info.loc[col_name]['Description'])"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2fDwidMMaCiW"
+      },
+      "source": [
+        "feat_info('mort_acc')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "IyhRDk3JaCiX"
+      },
+      "source": [
+        "## Loading the data and other imports"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "XEF412nda7Ed"
+      },
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "DiZuONSCaCiX"
+      },
+      "source": [
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "\n",
+        "# might be needed depending on your version of Jupyter\n",
+        "%matplotlib inline"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ifIxcv9MaCiY"
+      },
+      "source": [
+        "path2 = '/content/drive/MyDrive/Colab Notebooks/Neural networks/TensorFlow_FILES/DATA/lending_club_loan_two.csv'\n",
+        "df = pd.read_csv(path2)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Z5SiTDfSaCiY"
+      },
+      "source": [
+        "df.info()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "o-kufWMoZ21G"
+      },
+      "source": [
+        "df"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "7yx_tS5JaCiZ"
+      },
+      "source": [
+        "\n",
+        "\n",
+        "# Section 1: Exploratory Data Analysis\n",
+        "\n",
+        "**OVERALL GOAL: Get an understanding for which variables are important, view summary statistics, and visualize the data**\n",
+        "\n",
+        "\n",
+        "----"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "qSTOV5WiaCiZ"
+      },
+      "source": [
+        "Since we will be attempting to predict loan_status, creating a countplot as shown below."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "tvlfmY5saCia"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "7xjRRBo2aCia"
+      },
+      "source": [
+        "sns.countplot(x='loan_status',data=df)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ccWlmt4DaCib"
+      },
+      "source": [
+        " Creating a histogram of the loan_amnt column.\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0dD5ThXYaCic"
+      },
+      "source": [
+        "plt.figure(figsize=(12,4))\n",
+        "sns.distplot(df['loan_amnt'],kde=False,bins=40)\n",
+        "plt.xlim(0,45000)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "x3zz_msVaCic"
+      },
+      "source": [
+        "**Let's explore correlation between the continuous feature variables. Calculating the correlation between all continuous numeric variables using .corr() method.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1y7MYiHcaCid"
+      },
+      "source": [
+        "df.corr()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "-WEi4S22aCid"
+      },
+      "source": [
+        "**Using a heatmap.**\n",
+        "\n",
+        "\n",
+        "Some reference link: \n",
+        "* [Heatmap info](https://seaborn.pydata.org/generated/seaborn.heatmap.html#seaborn.heatmap)\n",
+        "\n",
+        "\n",
+        "\n",
+        "* [Help with resizing](https://stackoverflow.com/questions/56942670/matplotlib-seaborn-first-and-last-row-cut-in-half-of-heatmap-plot)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "O5zI2FUKaCie"
+      },
+      "source": [
+        "plt.figure(figsize=(12,7))\n",
+        "sns.heatmap(df.corr(),annot=True,cmap='YlOrRd')\n",
+        "plt.ylim(10, 0)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Br7PI4M7aCif"
+      },
+      "source": [
+        "** You should have noticed almost perfect correlation with the \"installment\" feature. Exploring this feature further. Printing out their descriptions and performing a scatterplot between them. **\n",
+        "\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "XTnwiGALaCif"
+      },
+      "source": [
+        "feat_info('installment')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "SNp_-HitaCig"
+      },
+      "source": [
+        "feat_info('loan_amnt')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "8GFcCus5aCig"
+      },
+      "source": [
+        "sns.scatterplot(x='installment',y='loan_amnt',data=df,)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "l5TUeui3aCih"
+      },
+      "source": [
+        "** Creating a boxplot to show the relationship between the loan_status and the Loan Amount.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "vUWZxoF5aCik"
+      },
+      "source": [
+        "sns.boxplot(x='loan_status',y='loan_amnt',data=df)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Y8UwY8ITaCim"
+      },
+      "source": [
+        "**Calculating the summary statistics for the loan amount, grouped by the loan_status.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "kFuDIE6DaCio"
+      },
+      "source": [
+        "df.groupby('loan_status')['loan_amnt'].describe()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "8EpOotp3aCip"
+      },
+      "source": [
+        "**Exploring the Grade and SubGrade columns that LendingClub attributes to the loans. What are the unique possible grades and subgrades?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "MmdaQh_JaCip"
+      },
+      "source": [
+        "sorted(df['grade'].unique())"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "JWy4NWCVaCiq"
+      },
+      "source": [
+        "sorted(df['sub_grade'].unique())"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "AKSIte2QaCiq"
+      },
+      "source": [
+        "**  Creating a countplot per grade. Set the hue to the loan_status label.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OQA9wkwbaCir"
+      },
+      "source": [
+        "sns.countplot(x='grade',data=df,hue='loan_status')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "MLd-6VPEaCis"
+      },
+      "source": [
+        "**Showing a count plot per subgrade**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "l8sCAozRaCis"
+      },
+      "source": [
+        "plt.figure(figsize=(12,4))\n",
+        "subgrade_order = sorted(df['sub_grade'].unique())\n",
+        "sns.countplot(x='sub_grade',data=df,order = subgrade_order,palette='coolwarm' )"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "HkI3F2ZMaCit"
+      },
+      "source": [
+        "plt.figure(figsize=(12,4))\n",
+        "subgrade_order = sorted(df['sub_grade'].unique())\n",
+        "sns.countplot(x='sub_grade',data=df,order = subgrade_order,palette='coolwarm' ,hue='loan_status')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xPHufrXWaCit"
+      },
+      "source": [
+        "**It looks like F and G subgrades don't get paid back that often. Isloating those and recreating the countplot just for those subgrades.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oFrvCPjSaCit"
+      },
+      "source": [
+        "f_and_g = df[(df['grade']=='G') | (df['grade']=='F')]\n",
+        "\n",
+        "plt.figure(figsize=(12,4))\n",
+        "subgrade_order = sorted(f_and_g['sub_grade'].unique())\n",
+        "sns.countplot(x='sub_grade',data=f_and_g,order = subgrade_order,hue='loan_status')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "kTjMyusjaCiu"
+      },
+      "source": [
+        "**TASK: Create a new column called 'load_repaid' which will contain a 1 if the loan status was \"Fully Paid\" and a 0 if it was \"Charged Off\".**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "afdfuy8uaCiu"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "jLXpfXTzaCiu"
+      },
+      "source": [
+        "df['loan_status'].unique()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "dBGw84V6aCiv"
+      },
+      "source": [
+        "df['loan_repaid'] = df['loan_status'].map({'Fully Paid':1,'Charged Off':0})"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "YevYlAg7aCiv"
+      },
+      "source": [
+        "df[['loan_repaid','loan_status']]"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "XXPlVSGEaCiv"
+      },
+      "source": [
+        "**CHALLENGE TASK: (Note this is hard, but can be done in one line!) Create a bar plot showing the correlation of the numeric features to the new loan_repaid column. [Helpful Link](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.bar.html)**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mdKCHBmlaCiv"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "9hJi2jrRaCiv"
+      },
+      "source": [
+        "df.corr()['loan_repaid'].sort_values().drop('loan_repaid').plot(kind='bar')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "AETxzQHzaCiw"
+      },
+      "source": [
+        "---\n",
+        "---\n",
+        "# Section 2: Data PreProcessing\n",
+        "\n",
+        "**Section Goals: Remove or fill any missing data. Remove unnecessary or repetitive features. Convert categorical string features to dummy variables.**\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "4t_1NOxZaCiw"
+      },
+      "source": [
+        "df.head()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "FCm9oPiwaCiw"
+      },
+      "source": [
+        "# Missing Data\n",
+        "\n",
+        "**Let's explore this missing data columns. We use a variety of factors to decide whether or not they would be useful, to see if we should keep, discard, or fill in the missing data.**"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "h_MBH6GGaCiw"
+      },
+      "source": [
+        "**TASK: What is the length of the dataframe?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "g3ai2FXaaCiw"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "SG3eWO21aCix"
+      },
+      "source": [
+        "len(df)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "wi8QnW4naCix"
+      },
+      "source": [
+        "**TASK: Create a Series that displays the total count of missing values per column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mzf0FzOJaCix"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "itipWCo3aCix"
+      },
+      "source": [
+        "df.isnull().sum()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ABoOTE0zaCix"
+      },
+      "source": [
+        "**TASK: Convert this Series to be in term of percentage of the total DataFrame**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BdL1uBr-aCiy"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ciij-0XlaCiy"
+      },
+      "source": [
+        "100* df.isnull().sum()/len(df)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Ze_ZODltaCiy"
+      },
+      "source": [
+        "**TASK: Let's examine emp_title and emp_length to see whether it will be okay to drop them. Print out their feature information using the feat_info() function from the top of this notebook.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rPckvt0xaCiy"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2mMETS14aCiy"
+      },
+      "source": [
+        "feat_info('emp_title')\n",
+        "print('\\n')\n",
+        "feat_info('emp_length')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "-ReGh0BMaCiy"
+      },
+      "source": [
+        "**TASK: How many unique employment job titles are there?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "whCbncfKaCiz"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_C3noPQ4aCiz"
+      },
+      "source": [
+        "df['emp_title'].nunique()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1i3rCgAlaCiz"
+      },
+      "source": [
+        "df['emp_title'].value_counts()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "oMrWuARlaCiz"
+      },
+      "source": [
+        "**TASK: Realistically there are too many unique job titles to try to convert this to a dummy variable feature. Let's remove that emp_title column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "PHAuRlHkaCiz"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "vFgnMfhiaCi0"
+      },
+      "source": [
+        "df = df.drop('emp_title',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ZmHg9XL2aCi0"
+      },
+      "source": [
+        "**TASK: Create a count plot of the emp_length feature column. Challenge: Sort the order of the values.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "D6C73GudaCi0"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_IU4qbjQaCi0"
+      },
+      "source": [
+        "sorted(df['emp_length'].dropna().unique())"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "eTRDztLzaCi0"
+      },
+      "source": [
+        "emp_length_order = [ '< 1 year',\n",
+        "                      '1 year',\n",
+        "                     '2 years',\n",
+        "                     '3 years',\n",
+        "                     '4 years',\n",
+        "                     '5 years',\n",
+        "                     '6 years',\n",
+        "                     '7 years',\n",
+        "                     '8 years',\n",
+        "                     '9 years',\n",
+        "                     '10+ years']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "FqzHexFeaCi0"
+      },
+      "source": [
+        "plt.figure(figsize=(12,4))\n",
+        "\n",
+        "sns.countplot(x='emp_length',data=df,order=emp_length_order)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "6QToHermaCi0"
+      },
+      "source": [
+        "**TASK: Plot out the countplot with a hue separating Fully Paid vs Charged Off**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "i2O0Ue4raCi1"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "8_WTigWjaCi1"
+      },
+      "source": [
+        "plt.figure(figsize=(12,4))\n",
+        "sns.countplot(x='emp_length',data=df,order=emp_length_order,hue='loan_status')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "CEVI5LqwaCi1"
+      },
+      "source": [
+        "**CHALLENGE TASK: This still doesn't really inform us if there is a strong relationship between employment length and being charged off, what we want is the percentage of charge offs per category. Essentially informing us what percent of people per employment category didn't pay back their loan. There are a multitude of ways to create this Series. Once you've created it, see if visualize it with a [bar plot](https://pandas.pydata.org/pandas-docs/version/0.23.4/generated/pandas.DataFrame.plot.html). This may be tricky, refer to solutions if you get stuck on creating this Series.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iw0bWgKxaCi1"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iaFAKfMraCi1"
+      },
+      "source": [
+        "emp_co = df[df['loan_status']==\"Charged Off\"].groupby(\"emp_length\").count()['loan_status']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "v8a4cE8AaCi1"
+      },
+      "source": [
+        "emp_fp = df[df['loan_status']==\"Fully Paid\"].groupby(\"emp_length\").count()['loan_status']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "T-UL8oW8aCi1"
+      },
+      "source": [
+        "emp_len = emp_co/emp_fp"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "6NCPXJISaCi2"
+      },
+      "source": [
+        "emp_len"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "dzk_R4L4aCi2"
+      },
+      "source": [
+        "emp_len.plot(kind='bar')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "kqSzYYOSaCi2"
+      },
+      "source": [
+        "**TASK: Charge off rates are extremely similar across all employment lengths. Go ahead and drop the emp_length column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "aPKsKYJJaCi2"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Ybhbel4daCi3"
+      },
+      "source": [
+        "df = df.drop('emp_length',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ETsr3t_8aCi3"
+      },
+      "source": [
+        "**TASK: Revisit the DataFrame to see what feature columns still have missing data.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "XqBtZXKxaCi3"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "05Xoh_UqaCi3"
+      },
+      "source": [
+        "df.isnull().sum()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "EOI_Ob34aCi4"
+      },
+      "source": [
+        "**TASK: Review the title column vs the purpose column. Is this repeated information?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "e_o_U_LbaCi4"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "aJ3BCLNPaCi4"
+      },
+      "source": [
+        "df['purpose'].head(10)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lGt-QmYjaCi5"
+      },
+      "source": [
+        "df['title'].head(10)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "LbxUQH4QaCi7"
+      },
+      "source": [
+        "**TASK: The title column is simply a string subcategory/description of the purpose column. Go ahead and drop the title column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "wkbZbzxCaCi8"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "nOFN2sFqaCi8"
+      },
+      "source": [
+        "df = df.drop('title',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "iikWRtRvaCi8"
+      },
+      "source": [
+        "---\n",
+        "**NOTE: This is one of the hardest parts of the project! Refer to the solutions video if you need guidance, feel free to fill or drop the missing values of the mort_acc however you see fit! Here we're going with a very specific approach.**\n",
+        "\n",
+        "\n",
+        "---\n",
+        "**TASK: Find out what the mort_acc feature represents**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "J3GOQfGlaCi8"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "xTf8nkAnaCi8"
+      },
+      "source": [
+        "feat_info('mort_acc')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "AEmQlW_8aCi9"
+      },
+      "source": [
+        "**TASK: Create a value_counts of the mort_acc column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "JWr073nWaCi9"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OFPUmFiLaCi9"
+      },
+      "source": [
+        "df['mort_acc'].value_counts()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "X-JHe4cnaCi9"
+      },
+      "source": [
+        "**TASK: There are many ways we could deal with this missing data. We could attempt to build a simple model to fill it in, such as a linear model, we could just fill it in based on the mean of the other columns, or you could even bin the columns into categories and then set NaN as its own category. There is no 100% correct approach! Let's review the other columsn to see which most highly correlates to mort_acc**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "TmxMneVvaCi9"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "R2R9DBKaaCi9"
+      },
+      "source": [
+        "print(\"Correlation with the mort_acc column\")\n",
+        "df.corr()['mort_acc'].sort_values()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Z5H0WYM_aCi-"
+      },
+      "source": [
+        "**TASK: Looks like the total_acc feature correlates with the mort_acc , this makes sense! Let's try this fillna() approach. We will group the dataframe by the total_acc and calculate the mean value for the mort_acc per total_acc entry. To get the result below:**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ioy2jAOsaCi-"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "e9OijPyjaCi-"
+      },
+      "source": [
+        "print(\"Mean of mort_acc column per total_acc\")\n",
+        "df.groupby('total_acc').mean()['mort_acc']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "GgOQcGE7aCi-"
+      },
+      "source": [
+        "**CHALLENGE TASK: Let's fill in the missing mort_acc values based on their total_acc value. If the mort_acc is missing, then we will fill in that missing value with the mean value corresponding to its total_acc value from the Series we created above. This involves using an .apply() method with two columns. Check out the link below for more info, or review the solutions video/notebook.**\n",
+        "\n",
+        "[Helpful Link](https://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe) "
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iHW02gcVaCi-"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "xoRTb1CTaCi-"
+      },
+      "source": [
+        "total_acc_avg = df.groupby('total_acc').mean()['mort_acc']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2T6zvOOIaCi_"
+      },
+      "source": [
+        "total_acc_avg[2.0]"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BwXLEKhWaCi_"
+      },
+      "source": [
+        "def fill_mort_acc(total_acc,mort_acc):\n",
+        "    '''\n",
+        "    Accepts the total_acc and mort_acc values for the row.\n",
+        "    Checks if the mort_acc is NaN , if so, it returns the avg mort_acc value\n",
+        "    for the corresponding total_acc value for that row.\n",
+        "    \n",
+        "    total_acc_avg here should be a Series or dictionary containing the mapping of the\n",
+        "    groupby averages of mort_acc per total_acc values.\n",
+        "    '''\n",
+        "    if np.isnan(mort_acc):\n",
+        "        return total_acc_avg[total_acc]\n",
+        "    else:\n",
+        "        return mort_acc"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "sDLFCew0aCi_"
+      },
+      "source": [
+        "df['mort_acc'] = df.apply(lambda x: fill_mort_acc(x['total_acc'], x['mort_acc']), axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "J_z8xSjYaCjA"
+      },
+      "source": [
+        "df.isnull().sum() "
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "sKZCTSejaCjA"
+      },
+      "source": [
+        "**TASK: revol_util and the pub_rec_bankruptcies have missing data points, but they account for less than 0.5% of the total data. Go ahead and remove the rows that are missing those values in those columns with dropna().**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rnXSXecRaCjA"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "F07_2e6iaCjA"
+      },
+      "source": [
+        "df = df.dropna()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "scrolled": true,
+        "id": "UNwXVN7caCjB"
+      },
+      "source": [
+        "df.isnull().sum()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "cAyaTXKQaCjB"
+      },
+      "source": [
+        "## Categorical Variables and Dummy Variables\n",
+        "\n",
+        "**We're done working with the missing data! Now we just need to deal with the string values due to the categorical columns.**\n",
+        "\n",
+        "**TASK: List all the columns that are currently non-numeric. [Helpful Link](https://stackoverflow.com/questions/22470690/get-list-of-pandas-dataframe-columns-based-on-data-type)**\n",
+        "\n",
+        "[Another very useful method call](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.select_dtypes.html)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "zsf1i5fIaCjB"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "KRTqeyBLaCjC"
+      },
+      "source": [
+        "df.select_dtypes(['object']).columns"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "jSQ7vyZZaCjC"
+      },
+      "source": [
+        "---\n",
+        "**Let's now go through all the string features to see what we should do with them.**\n",
+        "\n",
+        "---\n",
+        "\n",
+        "\n",
+        "### term feature\n",
+        "\n",
+        "**TASK: Convert the term feature into either a 36 or 60 integer numeric data type using .apply() or .map().**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "vwcF8_iAaCjD"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "6jxxQwpqaCjD"
+      },
+      "source": [
+        "df['term'].value_counts()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "exceeoXTaCjD"
+      },
+      "source": [
+        "# Or just use .map()\n",
+        "df['term'] = df['term'].apply(lambda term: int(term[:3]))"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Ul53o3XnaCjD"
+      },
+      "source": [
+        "### grade feature\n",
+        "\n",
+        "**TASK: We already know grade is part of sub_grade, so just drop the grade feature.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "cDx3NXQcaCjE"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lZTR2rBiaCjE"
+      },
+      "source": [
+        "df = df.drop('grade',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xkh1WixUaCjE"
+      },
+      "source": [
+        "**TASK: Convert the subgrade into dummy variables. Then concatenate these new columns to the original dataframe. Remember to drop the original subgrade column and to add drop_first=True to your get_dummies call.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ECHuHEf-aCjE"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "kErpNPbraCjF"
+      },
+      "source": [
+        "subgrade_dummies = pd.get_dummies(df['sub_grade'],drop_first=True)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "nVypC46vaCjF"
+      },
+      "source": [
+        "df = pd.concat([df.drop('sub_grade',axis=1),subgrade_dummies],axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "HbUS586EaCjF"
+      },
+      "source": [
+        "df.columns"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oQV_JCO9aCjF"
+      },
+      "source": [
+        "df.select_dtypes(['object']).columns"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "knSxTIzCaCjF"
+      },
+      "source": [
+        "### verification_status, application_type,initial_list_status,purpose \n",
+        "**TASK: Convert these columns: ['verification_status', 'application_type','initial_list_status','purpose'] into dummy variables and concatenate them with the original dataframe. Remember to set drop_first=True and to drop the original columns.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Xo91fxoOaCjG"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "BD1nxSckaCjG"
+      },
+      "source": [
+        "dummies = pd.get_dummies(df[['verification_status', 'application_type','initial_list_status','purpose' ]],drop_first=True)\n",
+        "df = df.drop(['verification_status', 'application_type','initial_list_status','purpose'],axis=1)\n",
+        "df = pd.concat([df,dummies],axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "OYRV7G9HaCjG"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Ro9ZiaHCaCjG"
+      },
+      "source": [
+        "### home_ownership\n",
+        "**TASK:Review the value_counts for the home_ownership column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "m_64xTcJaCjG"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "jr7561BFaCjG"
+      },
+      "source": [
+        "df['home_ownership'].value_counts()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "XUsfvtvGaCjH"
+      },
+      "source": [
+        "**TASK: Convert these to dummy variables, but [replace](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.replace.html) NONE and ANY with OTHER, so that we end up with just 4 categories, MORTGAGE, RENT, OWN, OTHER. Then concatenate them with the original dataframe. Remember to set drop_first=True and to drop the original columns.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Jlq7AUJ9aCjH"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "rz7ryF77aCjH"
+      },
+      "source": [
+        "df['home_ownership']=df['home_ownership'].replace(['NONE', 'ANY'], 'OTHER')\n",
+        "\n",
+        "dummies = pd.get_dummies(df['home_ownership'],drop_first=True)\n",
+        "df = df.drop('home_ownership',axis=1)\n",
+        "df = pd.concat([df,dummies],axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "yuF2eoVeaCjH"
+      },
+      "source": [
+        "### address\n",
+        "**TASK: Let's feature engineer a zip code column from the address in the data set. Create a column called 'zip_code' that extracts the zip code from the address column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "VR8v3smXaCjH"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "tFFTw93DaCjH"
+      },
+      "source": [
+        "df['zip_code'] = df['address'].apply(lambda address:address[-5:])"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "DPuWB1GHaCjI"
+      },
+      "source": [
+        "**TASK: Now make this zip_code column into dummy variables using pandas. Concatenate the result and drop the original zip_code column along with dropping the address column.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "LR8bPv8_aCjI"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "QbZbOLg7aCjI"
+      },
+      "source": [
+        "dummies = pd.get_dummies(df['zip_code'],drop_first=True)\n",
+        "df = df.drop(['zip_code','address'],axis=1)\n",
+        "df = pd.concat([df,dummies],axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "qen74xjyaCjI"
+      },
+      "source": [
+        "### issue_d \n",
+        "\n",
+        "**TASK: This would be data leakage, we wouldn't know beforehand whether or not a loan would be issued when using our model, so in theory we wouldn't have an issue_date, drop this feature.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IayUBU-6aCjI"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "u4HKwnMaaCjI"
+      },
+      "source": [
+        "df = df.drop('issue_d',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "yYJmZYj9aCjJ"
+      },
+      "source": [
+        "### earliest_cr_line\n",
+        "**TASK: This appears to be a historical time stamp feature. Extract the year from this feature using a .apply function, then convert it to a numeric feature. Set this new data to a feature column called 'earliest_cr_year'.Then drop the earliest_cr_line feature.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Vl6rladXaCjJ"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "F8gpsYHlaCjJ"
+      },
+      "source": [
+        "df['earliest_cr_year'] = df['earliest_cr_line'].apply(lambda date:int(date[-4:]))\n",
+        "df = df.drop('earliest_cr_line',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "JgtEEj3maCjJ"
+      },
+      "source": [
+        "df.select_dtypes(['object']).columns"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "brAy6VRiaCjJ"
+      },
+      "source": [
+        "## Train Test Split"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "yJ-AtRoAaCjJ"
+      },
+      "source": [
+        "**TASK: Import train_test_split from sklearn.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ZXHE2qRGaCjJ"
+      },
+      "source": [
+        "from sklearn.model_selection import train_test_split"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "SFos66vVaCjJ"
+      },
+      "source": [
+        "**TASK: drop the load_status column we created earlier, since its a duplicate of the loan_repaid column. We'll use the loan_repaid column since its already in 0s and 1s.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "IclT3cr-aCjK"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "U49KhdiRaCjK"
+      },
+      "source": [
+        "df = df.drop('loan_status',axis=1)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "iXs5fQ55aCjK"
+      },
+      "source": [
+        "**TASK: Set X and y variables to the .values of the features and label.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "l5t9HpyhaCjK"
+      },
+      "source": [
+        "#CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mATx0ANIaCjK"
+      },
+      "source": [
+        "X = df.drop('loan_repaid',axis=1).values\n",
+        "y = df['loan_repaid'].values"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5iCazcYiaCjK"
+      },
+      "source": [
+        "----\n",
+        "----\n",
+        "\n",
+        "# OPTIONAL\n",
+        "\n",
+        "## Grabbing a Sample for Training Time\n",
+        "\n",
+        "### OPTIONAL: Use .sample() to grab a sample of the 490k+ entries to save time on training. Highly recommended for lower RAM computers or if you are not using GPU.\n",
+        "\n",
+        "----\n",
+        "----"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "FXEaYx9maCjK"
+      },
+      "source": [
+        "# df = df.sample(frac=0.1,random_state=101)\n",
+        "print(len(df))"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "VIBfyzpyaCjK"
+      },
+      "source": [
+        "**TASK: Perform a train/test split with test_size=0.2 and a random_state of 101.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "VrI95p1iaCjK"
+      },
+      "source": [
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=101)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "wvZu42pXaCjL"
+      },
+      "source": [
+        "## Normalizing the Data\n",
+        "\n",
+        "**TASK: Use a MinMaxScaler to normalize the feature data X_train and X_test. Recall we don't want data leakge from the test set so we only fit on the X_train data.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "JK7xLZF7aCjL"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-HqeYSkiFWIi"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "dUtemAzyaCjL"
+      },
+      "source": [
+        "from sklearn.preprocessing import MinMaxScaler"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1g1mh_NcaCjM"
+      },
+      "source": [
+        "scaler = MinMaxScaler()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "WiAoRxsGaCjM"
+      },
+      "source": [
+        "X_train = scaler.fit_transform(X_train)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "O8E7AWZfaCjM"
+      },
+      "source": [
+        "X_test = scaler.transform(X_test)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "djqAHy7BaCjN"
+      },
+      "source": [
+        "# Creating the Model\n",
+        "\n",
+        "**TASK: Run the cell below to import the necessary Keras functions.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "EOSWQUXMaCjN"
+      },
+      "source": [
+        "import tensorflow as tf\n",
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import Dense, Activation, Dropout\n",
+        "from tensorflow.keras.constraints import max_norm"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Iro4YnrDaCjN"
+      },
+      "source": [
+        "**TASK: Build a sequential model to will be trained on the data. You have unlimited options here, but here is what the solution uses: a model that goes 78 --> 39 --> 19--> 1 output neuron. OPTIONAL: Explore adding [Dropout layers](https://keras.io/layers/core/) [1](https://en.wikipedia.org/wiki/Dropout_(neural_networks)) [2](https://towardsdatascience.com/machine-learning-part-20-dropout-keras-layers-explained-8c9f6dc4c9ab)**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ZAZuPOJUaCjO"
+      },
+      "source": [
+        "# CODE HERE\n",
+        "model = Sequential()\n",
+        "\n",
+        "# Choose whatever number of layers/neurons you want.\n",
+        "\n",
+        "# https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw\n",
+        "\n",
+        "# Remember to compile()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lgHqsVMjaCjO"
+      },
+      "source": [
+        "model = Sequential()\n",
+        "\n",
+        "# https://stats.stackexchange.com/questions/181/how-to-choose-the-number-of-hidden-layers-and-nodes-in-a-feedforward-neural-netw\n",
+        "\n",
+        "\n",
+        "# input layer\n",
+        "model.add(Dense(78,  activation='relu'))\n",
+        "model.add(Dropout(0.2))\n",
+        "\n",
+        "# hidden layer\n",
+        "model.add(Dense(39, activation='relu'))\n",
+        "model.add(Dropout(0.2))\n",
+        "\n",
+        "# hidden layer\n",
+        "model.add(Dense(19, activation='relu'))\n",
+        "model.add(Dropout(0.2))\n",
+        "\n",
+        "# output layer\n",
+        "model.add(Dense(units=1,activation='sigmoid'))\n",
+        "\n",
+        "# Compile model\n",
+        "model.compile(loss='binary_crossentropy', optimizer='adam')"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "UsrcF1FUaCjO"
+      },
+      "source": [
+        "**TASK: Fit the model to the training data for at least 25 epochs. Also add in the validation data for later plotting. Optional: add in a batch_size of 256.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "3Rg7bTqtaCjP"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Ow7kvNU6aCjP"
+      },
+      "source": [
+        "model.fit(x=X_train, \n",
+        "          y=y_train, \n",
+        "          epochs=25,\n",
+        "          batch_size=256,\n",
+        "          validation_data=(X_test, y_test), \n",
+        "          )"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "O5YtEuJuaCjP"
+      },
+      "source": [
+        "**TASK: OPTIONAL: Save your model.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "CSP1lfuxaCjP"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Oa2gTxiSaCjP"
+      },
+      "source": [
+        "from tensorflow.keras.models import load_model"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "dZToBzC1aCjP"
+      },
+      "source": [
+        "model.save('full_data_project_model.h5')  "
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "EVjirS0gaCjQ"
+      },
+      "source": [
+        "# Section 3: Evaluating Model Performance.\n",
+        "\n",
+        "**TASK: Plot out the validation loss versus the training loss.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "jV7ahre4aCjQ"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "tQbitPuwaCjQ"
+      },
+      "source": [
+        "losses = pd.DataFrame(model.history.history)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "MFlxyU2taCjQ"
+      },
+      "source": [
+        "losses[['loss','val_loss']].plot()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "NlcLJNf4aCjQ"
+      },
+      "source": [
+        "**TASK: Create predictions from the X_test set and display a classification report and confusion matrix for the X_test set.**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "nUmIQKAeaCjQ"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "qZYNRdqraCjR"
+      },
+      "source": [
+        "from sklearn.metrics import classification_report,confusion_matrix"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lCYIUr3ZaCjR"
+      },
+      "source": [
+        "predictions = model.predict_classes(X_test)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "CPMFg1TkaCjR"
+      },
+      "source": [
+        "\n",
+        "\n",
+        "print(classification_report(y_test,predictions)) \n",
+        "\n"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "p7PcZ7ahaCjR"
+      },
+      "source": [
+        "confusion_matrix(y_test,predictions)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TCtwbxaDaCjR"
+      },
+      "source": [
+        "**TASK: Given the customer below, would you offer this person a loan?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "DS0ddhbWaCjS"
+      },
+      "source": [
+        "import random\n",
+        "random.seed(101)\n",
+        "random_ind = random.randint(0,len(df))\n",
+        "\n",
+        "new_customer = df.drop('loan_repaid',axis=1).iloc[random_ind]\n",
+        "new_customer\n"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "1Xlkc1u-aCjS"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "7Fzq6SMbaCjS"
+      },
+      "source": [
+        "model.predict_classes(new_customer.values.reshape(1,78))"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "rQFlBuayaCjS"
+      },
+      "source": [
+        "**TASK: Now check, did this person actually end up paying back their loan?**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-B8zDSfSaCjT"
+      },
+      "source": [
+        "# CODE HERE"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "mD3smTAKaCjT"
+      },
+      "source": [
+        "df.iloc[random_ind]['loan_repaid']"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "NutgacNEaCjT"
+      },
+      "source": [
+        "# GREAT JOB!"
+      ]
+    }
+  ]
+}
